@@ -23,16 +23,7 @@ public class MainActivity extends AppCompatActivity {
         myWebView = (WebView) findViewById(R.id.webView);
         final android.webkit.WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-       // webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        //Log.i(LOG_TAG, "onRefresh called from SwipeRefreshLayout");
-
-        // This method performs the actual data-refresh operation.
-        // The method calls setRefreshing(false) when it's finished.
-        // myUpdateOperation();
-        //myWebView.reload();
-
-        //webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-
+        webSettings.setDomStorageEnabled(true);
         myWebView.setWebViewClient(new WebViewClient() {
 
 
@@ -74,28 +65,21 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
 
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                    startActivity(browserIntent);
 
-                    return true;
+                if (url.startsWith("https://api.whatsapp.com/")) {
 
-                }*/
+                    UrlQuerySanitizer snt = new UrlQuerySanitizer();
+                    snt.setAllowUnregisteredParamaters(true);
+                    snt.parseUrl(url);
+                    String body =snt.getValue("text");
+                    String phone=snt.getValue("phone");
 
-               if (url.startsWith("https://api.whatsapp.com/")) {
-
-                   UrlQuerySanitizer snt = new UrlQuerySanitizer();
-                   snt.setAllowUnregisteredParamaters(true);
-                   snt.parseUrl(url);
-                   String phone=snt.getValue("phone");
-
-                   String smsUrl="sms:"+phone+"?body"+body;
-                   String whatsappUrl="https://api.whatsapp.com/send?phone="+ phone +"&text=" + body;
-                   boolean installed = appInstalledOrNot("com.whatsapp");
-                   if(installed) {
-                       Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                               Uri.parse(url));
-                       startActivity(browserIntent);
                     String smsUrl="sms:"+phone+"?body"+body;
+                    String whatsappUrl="https://api.whatsapp.com/send?phone="+ phone +"&text=" + body;
+                    boolean installed = appInstalledOrNot("com.whatsapp");
+                    if(installed) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(url));
                         startActivity(browserIntent);
 
                         return true;
