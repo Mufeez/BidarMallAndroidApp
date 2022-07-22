@@ -4,9 +4,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.UrlQuerySanitizer;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -16,18 +15,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         myWebView = (WebView) findViewById(R.id.webView);
-        // myWebView.clearCache(true);
         final android.webkit.WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        //webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        myWebView.loadUrl("http://www.96lakhstores.com");
        // webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         //Log.i(LOG_TAG, "onRefresh called from SwipeRefreshLayout");
 
@@ -56,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(sendMessages);
                     return true;
                 }
-                if (url.startsWith("smsto:")) {
+                if (url.startsWith("smartos:")) {
                     UrlQuerySanitizer snt = new UrlQuerySanitizer();
                     snt.setAllowUnregisteredParamaters(true);
                     snt.parseUrl(url);
@@ -78,10 +73,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     return true;
                 }
-               /* if (!(url.startsWith("http://www.96")||url.startsWith("tel")||url.startsWith("sms"))) {
 
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(url));
                     startActivity(browserIntent);
 
                     return true;
@@ -93,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
                    UrlQuerySanitizer snt = new UrlQuerySanitizer();
                    snt.setAllowUnregisteredParamaters(true);
                    snt.parseUrl(url);
-                   String body =snt.getValue("text");
                    String phone=snt.getValue("phone");
 
                    String smsUrl="sms:"+phone+"?body"+body;
@@ -103,13 +95,15 @@ public class MainActivity extends AppCompatActivity {
                        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                                Uri.parse(url));
                        startActivity(browserIntent);
+                    String smsUrl="sms:"+phone+"?body"+body;
+                        startActivity(browserIntent);
 
-                       return true;
-                   } else {
-                       Intent sendMessages = new Intent(Intent.ACTION_SENDTO, Uri.parse(smsUrl));
-                       startActivity(sendMessages);
-                   }
-                   return true;
+                        return true;
+                    } else {
+                        Intent sendMessages = new Intent(Intent.ACTION_SENDTO, Uri.parse(smsUrl));
+                        startActivity(sendMessages);
+                    }
+                    return true;
 
                 }
 
@@ -121,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         });
-
+        myWebView.loadUrl("https://www.bidarmall.com");
 
     };
 
@@ -130,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
         if(myWebView.canGoBack()){myWebView.goBack();}
         else {super.onBackPressed();}
     }
-
 
     private boolean appInstalledOrNot(String uri) {
         PackageManager pm = getPackageManager();
@@ -144,4 +137,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return app_installed;
     }
+
 }
