@@ -1,13 +1,25 @@
 package net.azurewebsites.chitguppa.dukaan;
 
+import android.Manifest;
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.UrlQuerySanitizer;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.webkit.DownloadListener;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,11 +31,54 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        int permissionCheck = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            //requesting permission
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        } else {
+
+        }
+        int permissionCheck2 = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permissionCheck2 != PackageManager.PERMISSION_GRANTED) {
+            //requesting permission
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        } else {
+
+        }
+        int permissionCheck3 = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_NOTIFICATION_POLICY);
+        if (permissionCheck3 != PackageManager.PERMISSION_GRANTED) {
+            //requesting permission
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NOTIFICATION_POLICY}, 1);
+        } else {
+
+        }
         setContentView(R.layout.activity_main);
         myWebView = (WebView) findViewById(R.id.webView);
+
         final android.webkit.WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setJavaScriptEnabled(true);
+        myWebView.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
+                myWebView.loadUrl(JavaScriptInterface.getBase64StringFromBlobUrl(url));
+            }
+        });
+        webSettings.setAppCachePath(MainActivity.this.getApplicationContext().getCacheDir().getAbsolutePath());
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+        myWebView.addJavascriptInterface(new JavaScriptInterface(MainActivity.this.getApplicationContext()), "Android");
+        webSettings.setPluginState(WebSettings.PluginState.ON);
+
+
+
+
         myWebView.setWebViewClient(new WebViewClient() {
 
 
@@ -46,13 +101,13 @@ public class MainActivity extends AppCompatActivity {
                     UrlQuerySanitizer snt = new UrlQuerySanitizer();
                     snt.setAllowUnregisteredParamaters(true);
                     snt.parseUrl(url);
-                    String body =snt.getValue("body");
-                    String phone=snt.getValue("phone");
+                    String body = snt.getValue("body");
+                    String phone = snt.getValue("phone");
 
-                    String smsUrl="sms:"+phone+"?body"+body;
-                    String whatsappUrl="https://api.whatsapp.com/send?phone="+ phone +"&text=" + body;
+                    String smsUrl = "sms:" + phone + "?body" + body;
+                    String whatsappUrl = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + body;
                     boolean installed = appInstalledOrNot("com.whatsapp");
-                    if(installed) {
+                    if (installed) {
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                                 Uri.parse(url));
                         startActivity(browserIntent);
@@ -71,13 +126,13 @@ public class MainActivity extends AppCompatActivity {
                     UrlQuerySanitizer snt = new UrlQuerySanitizer();
                     snt.setAllowUnregisteredParamaters(true);
                     snt.parseUrl(url);
-                    String body =snt.getValue("text");
-                    String phone=snt.getValue("phone");
+                    String body = snt.getValue("text");
+                    String phone = snt.getValue("phone");
 
-                    String smsUrl="sms:"+phone+"?body"+body;
-                    String whatsappUrl="https://api.whatsapp.com/send?phone="+ phone +"&text=" + body;
+                    String smsUrl = "sms:" + phone + "?body" + body;
+                    String whatsappUrl = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + body;
                     boolean installed = appInstalledOrNot("com.whatsapp");
-                    if(installed) {
+                    if (installed) {
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                                 Uri.parse(url));
                         startActivity(browserIntent);
@@ -90,6 +145,12 @@ public class MainActivity extends AppCompatActivity {
                     return true;
 
                 }
+
+                if (url.endsWith("invoices"))
+
+
+
+
 
                 myWebView.loadUrl(url);
                 return true;
@@ -109,6 +170,17 @@ public class MainActivity extends AppCompatActivity {
         else {super.onBackPressed();}
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            //you have the permission now.
+
+        }
+
+
+    }
+
     private boolean appInstalledOrNot(String uri) {
         PackageManager pm = getPackageManager();
         boolean app_installed;
@@ -121,5 +193,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return app_installed;
     }
+
+
 
 }
