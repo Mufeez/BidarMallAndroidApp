@@ -1,4 +1,4 @@
-package net.azurewebsites.chitguppa.dukaan;
+package net.azurewebsites.chitguppa.aasaan;
 
 import org.junit.Test;
 

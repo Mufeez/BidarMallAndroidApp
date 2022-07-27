@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.azurewebsites.chitguppa.dukaan">
+    package="net.azurewebsites.chitguppa.aasaan">
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -23,7 +23,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths"/>
         </provider>
-        <activity android:name=".MainActivity">
+        <activity android:name="net.azurewebsites.chitguppa.aasaan.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

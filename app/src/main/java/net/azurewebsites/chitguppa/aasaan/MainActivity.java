@@ -1,25 +1,17 @@
-package net.azurewebsites.chitguppa.dukaan;
+package net.azurewebsites.chitguppa.aasaan;
 
 import android.Manifest;
-import android.app.DownloadManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.UrlQuerySanitizer;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
-import android.nfc.Tag;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.webkit.DownloadListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
 
         }
+
         setContentView(R.layout.activity_main);
         myWebView = (WebView) findViewById(R.id.webView);
 

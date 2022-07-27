@@ -1,4 +1,4 @@
-package net.azurewebsites.chitguppa.dukaan;
+package net.azurewebsites.chitguppa.aasaan;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
