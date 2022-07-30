@@ -34,6 +34,7 @@ public class JavaScriptInterface {
         convertBase64StringToPdfAndStoreIt(base64Data);
     }
     public static String getBase64StringFromBlobUrl(String blobUrl) {
+
         if(blobUrl.startsWith("blob")){
             return "javascript: var xhr = new XMLHttpRequest();" +
                     "xhr.open('GET', '"+ blobUrl +"', true);" +

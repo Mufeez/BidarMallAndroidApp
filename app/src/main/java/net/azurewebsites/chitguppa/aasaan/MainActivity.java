@@ -24,30 +24,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int permissionCheck = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            //requesting permission
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        } else {
-
-        }
-        int permissionCheck2 = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (permissionCheck2 != PackageManager.PERMISSION_GRANTED) {
-            //requesting permission
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        } else {
-
-        }
-        int permissionCheck3 = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_NOTIFICATION_POLICY);
-        if (permissionCheck3 != PackageManager.PERMISSION_GRANTED) {
-            //requesting permission
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NOTIFICATION_POLICY}, 1);
-        } else {
-
-        }
 
         setContentView(R.layout.activity_main);
         myWebView = (WebView) findViewById(R.id.webView);
+
 
         final android.webkit.WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -57,7 +37,27 @@ public class MainActivity extends AppCompatActivity {
         myWebView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
-                myWebView.loadUrl(JavaScriptInterface.getBase64StringFromBlobUrl(url));
+                int permissionCheckES = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                int permissionCheckIS = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE);
+                int permissionCheckNP = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_NOTIFICATION_POLICY);
+                if (permissionCheckES != PackageManager.PERMISSION_GRANTED) {
+                    //requesting permission
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                }
+
+                else if (permissionCheckIS != PackageManager.PERMISSION_GRANTED) {
+                    //requesting permission
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                }
+
+               else  if (permissionCheckNP != PackageManager.PERMISSION_GRANTED) {
+                    //requesting permission
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NOTIFICATION_POLICY}, 1);
+                } else {
+                    myWebView.loadUrl(JavaScriptInterface.getBase64StringFromBlobUrl(url));
+
+                }
+
             }
         });
         webSettings.setAppCachePath(MainActivity.this.getApplicationContext().getCacheDir().getAbsolutePath());
