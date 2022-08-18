@@ -1,5 +1,6 @@
 package net.azurewebsites.chitguppa.aasaan;
 
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -113,4 +114,12 @@ public class JavaScriptInterface {
         }
         Toast.makeText(context, "PDF FILE DOWNLOADED!", Toast.LENGTH_SHORT).show();
     }
+    @JavascriptInterface
+    public void makePayment(String options) {
+
+        context.startActivity(new Intent(context,PaymentActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("options",options));
+        //Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+    }
+
+
 }

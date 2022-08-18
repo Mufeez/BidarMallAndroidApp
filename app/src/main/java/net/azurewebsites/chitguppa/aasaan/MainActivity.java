@@ -5,13 +5,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.UrlQuerySanitizer;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import android.os.Bundle;
+import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,16 +27,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
 
+
         setContentView(R.layout.activity_main);
         myWebView = (WebView) findViewById(R.id.webView);
 
 
         final android.webkit.WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         webSettings.setDomStorageEnabled(true);
         webSettings.setAllowFileAccess(true);
-        webSettings.setJavaScriptEnabled(true);
-        myWebView.setDownloadListener(new DownloadListener() {
+        webSettings.setSupportMultipleWindows(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+       myWebView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
                 int permissionCheckES = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -53,31 +58,35 @@ public class MainActivity extends AppCompatActivity {
                else  if (permissionCheckNP != PackageManager.PERMISSION_GRANTED) {
                     //requesting permission
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NOTIFICATION_POLICY}, 1);
-                } else {
-                    myWebView.loadUrl(JavaScriptInterface.getBase64StringFromBlobUrl(url));
-
                 }
+
+               myWebView.loadUrl(JavaScriptInterface.getBase64StringFromBlobUrl(url));
+
+
 
             }
         });
         webSettings.setAppCachePath(MainActivity.this.getApplicationContext().getCacheDir().getAbsolutePath());
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webSettings.setDatabaseEnabled(true);
-        webSettings.setDomStorageEnabled(true);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
         myWebView.addJavascriptInterface(new JavaScriptInterface(MainActivity.this.getApplicationContext()), "Android");
         webSettings.setPluginState(WebSettings.PluginState.ON);
+        myWebView.loadUrl("https://retailcenter.io");
 
 
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(myWebView, true);
+        } else {
+            CookieManager.getInstance().setAcceptCookie(true);
+        }
 
 
-        myWebView.setWebViewClient(new WebViewClient() {
-
-
-
+        myWebView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView myWebView, String url) {
+
+
                 if (url.startsWith("tel:")) {
                     Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
                     startActivity(intent);
@@ -139,21 +148,19 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-                if (url.endsWith("invoices"))
 
-
-
-
-
-                myWebView.loadUrl(url);
-                return true;
+                return false;
             }
 
 
 
 
         });
-        myWebView.loadUrl("https://www.bidarmall.com");
+
+
+
+
+
 
     };
 
