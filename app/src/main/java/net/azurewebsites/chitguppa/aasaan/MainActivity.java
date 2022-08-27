@@ -8,6 +8,8 @@ import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.GeolocationPermissions;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -18,7 +20,9 @@ import androidx.core.app.ActivityCompat;
 public class MainActivity extends AppCompatActivity {
 
     private android.webkit.WebView myWebView;
-
+    String mGeoLocationRequestOrigin = null;
+    GeolocationPermissions.Callback  mGeoLocationCallback = null;
+    String URL=null;
 
 
 
@@ -29,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         setContentView(R.layout.activity_main);
+
+
+
         myWebView = (WebView) findViewById(R.id.webView);
 
 
@@ -37,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         webSettings.setDomStorageEnabled(true);
         webSettings.setAllowFileAccess(true);
-        webSettings.setSupportMultipleWindows(true);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-       myWebView.setDownloadListener(new DownloadListener() {
+        webSettings.setGeolocationEnabled(true);
+        webSettings.setGeolocationDatabasePath(getFilesDir().getPath());
+        webSettings.setPluginState(WebSettings.PluginState.ON);
+        myWebView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
                 int permissionCheckES = ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -52,15 +60,18 @@ public class MainActivity extends AppCompatActivity {
 
                 else if (permissionCheckIS != PackageManager.PERMISSION_GRANTED) {
                     //requesting permission
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
                 }
 
                else  if (permissionCheckNP != PackageManager.PERMISSION_GRANTED) {
                     //requesting permission
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NOTIFICATION_POLICY}, 1);
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_NOTIFICATION_POLICY}, 3);
                 }
 
-               myWebView.loadUrl(JavaScriptInterface.getBase64StringFromBlobUrl(url));
+
+
+                    myWebView.loadUrl(JavaScriptInterface.getBase64StringFromBlobUrl(url));
+
 
 
 
@@ -72,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setLoadWithOverviewMode(true);
         myWebView.addJavascriptInterface(new JavaScriptInterface(MainActivity.this.getApplicationContext()), "Android");
         webSettings.setPluginState(WebSettings.PluginState.ON);
-        myWebView.loadUrl("https://retailcenter.io");
+        myWebView.loadUrl("https://www.retailcenter.io");
+
 
 
         if (android.os.Build.VERSION.SDK_INT >= 21) {
@@ -82,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        myWebView.setWebViewClient(new WebViewClient(){
+       myWebView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView myWebView, String url) {
 
@@ -160,6 +172,29 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        myWebView.setWebChromeClient(new WebChromeClient(){
+            @Override
+            public void onGeolocationPermissionsShowPrompt(final String origin,
+                                                           final GeolocationPermissions.Callback callback) {
+
+                int permissionCheckFineLocation = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
+                if (permissionCheckFineLocation!= PackageManager.PERMISSION_GRANTED) {
+                    mGeoLocationCallback=callback;
+                    mGeoLocationRequestOrigin=origin;
+                    //requesting permission
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                }
+
+                else {// permission and the user has therefore already granted it
+                    callback.invoke(origin, true, false);
+                }
+
+            }
+        });
+
+
+
+
 
 
     };
@@ -175,6 +210,9 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
             //you have the permission now.
+            if(requestCode==123) {
+                mGeoLocationCallback.invoke(mGeoLocationRequestOrigin, true, false);
+            }
 
         }
 
